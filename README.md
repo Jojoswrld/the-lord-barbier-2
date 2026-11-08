@@ -1,9 +1,12 @@
-# The Lord Barbier
+# The Lord Barbier 2
 
-Website for The Lord Barbier, a classic barbershop in La Fortuna, San Carlos, Costa Rica (since 2020).
+Second version of the website for The Lord Barbier, a classic barbershop in La Fortuna, San Carlos, Costa Rica (since 2020).
 Bilingual (Spanish / English), black and white, with WhatsApp booking.
 
 Live: https://the-lord-barbier.pages.dev
+
+Its sister site, The Lord Barbier 1 (the first version, with Nicole's nail corner), is the repo `the-lord-barbier-1`.
+
 Villa / hotel QR card (printable A6): https://the-lord-barbier.pages.dev/villa-card
 
 ## Stack
