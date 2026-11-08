@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import { Mail, Menu, MessageCircle } from "lucide-react"
-import { siFacebook, siWhatsapp } from "simple-icons"
+import { facebookPath, whatsappPath } from "@/brand-icons"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,8 +8,10 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { business, gallery, shopPhoto, shopServices, t, visitServices, type Lang, type Service } from "@/content"
-import { BookingSection } from "@/booking"
+
 import { FadeImg, HeroSlides, PhotoViewer } from "@/photos"
+
+const BookingSection = lazy(() => import("@/booking").then((m) => ({ default: m.BookingSection })))
 
 function initialLang(): Lang {
   // A ?lang=en / ?lang=es link (e.g. from the villa QR card) wins over everything else.
@@ -24,7 +26,7 @@ const textLink =
   "inline-flex items-center gap-2 underline decoration-1 underline-offset-[6px] decoration-current/40 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring rounded-[2px]"
 
 
-/** Single-color brand logo (WhatsApp, Facebook) drawn from simple-icons, sized to sit next to text. */
+/** Single-color brand logo (WhatsApp, Facebook) sized to sit next to text. */
 function BrandIcon({ path }: { path: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className="size-[18px] shrink-0 fill-current">
@@ -304,7 +306,13 @@ export default function App() {
           </div>
         </section>
 
-        <BookingSection lang={lang} />
+        {/* The booking form sits far down the page, so its code (form parts, calendar, dates) comes in a
+            separate file that downloads alongside the first paint instead of delaying it. */}
+        <div id="book" className="dark min-h-[56rem] scroll-mt-16 bg-background text-foreground md:min-h-[44rem]">
+          <Suspense fallback={null}>
+            <BookingSection lang={lang} />
+          </Suspense>
+        </div>
       </main>
 
       <footer className="dark border-t bg-background py-14 text-foreground">
@@ -322,7 +330,7 @@ export default function App() {
                   aria-label={`WhatsApp +506 ${business.phoneDisplay}`}
                   className="inline-flex items-center gap-3 hover:underline"
                 >
-                  <BrandIcon path={siWhatsapp.path} />
+                  <BrandIcon path={whatsappPath} />
                   +506 {business.phoneDisplay}
                 </a>
               </li>
@@ -334,7 +342,7 @@ export default function App() {
                   aria-label="Facebook: The Lord Barbier"
                   className="inline-flex items-center gap-3 hover:underline"
                 >
-                  <BrandIcon path={siFacebook.path} />
+                  <BrandIcon path={facebookPath} />
                   The Lord Barbier
                 </a>
               </li>
@@ -364,7 +372,7 @@ export default function App() {
         )}
       >
         <a href="#book" tabIndex={showBar ? 0 : -1} className={cn(buttonVariants({ size: "lg" }), "w-full")}>
-          <BrandIcon path={siWhatsapp.path} /> {c.hero.book}
+          <BrandIcon path={whatsappPath} /> {c.hero.book}
         </a>
       </div>
     </div>

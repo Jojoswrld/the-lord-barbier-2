@@ -1,11 +1,10 @@
-import { useRef, useState } from "react"
+import { lazy, Suspense, useRef, useState } from "react"
 import { format } from "date-fns"
 import { enUS, es } from "date-fns/locale"
 import { CalendarDays, Mail, Minus, Plus } from "lucide-react"
-import { siWhatsapp } from "simple-icons"
+import { whatsappPath } from "@/brand-icons"
 
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import {
   Field,
   FieldContent,
@@ -26,13 +25,23 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { business, shopServices, t, visitServices, type Lang } from "@/content"
 
+// The calendar (react-day-picker) is the heaviest part of the page, so it is only downloaded
+// when someone is about to pick a date: on hover, focus or tap of the date button.
+const loadCalendar = () => import("@/components/ui/calendar")
+const Calendar = lazy(() => loadCalendar().then((m) => ({ default: m.Calendar })))
+
+/** Same footprint as the calendar, so the popover doesn't jump while it loads. */
+function CalendarPlaceholder() {
+  return <div aria-hidden className="h-[19rem] w-[17rem] animate-pulse rounded-[3px] bg-muted/40 motion-reduce:animate-none" />
+}
+
 type Where = "shop" | "villa"
 type When = "morning" | "afternoon" | "any"
 
 function WhatsAppIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className="size-[18px] shrink-0 fill-current">
-      <path d={siWhatsapp.path} />
+      <path d={whatsappPath} />
     </svg>
   )
 }
@@ -86,7 +95,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
   }
 
   return (
-    <section id="book" className="dark scroll-mt-16 bg-background py-16 text-foreground md:py-24">
+    <section className="py-16 md:py-24">
       <div className="mx-auto grid max-w-6xl gap-12 px-5 md:grid-cols-[1fr_1.4fr] md:gap-16">
         {/* left: what this is and what happens after sending */}
         <div className="md:sticky md:top-28 md:self-start">
@@ -170,6 +179,9 @@ export function BookingSection({ lang }: { lang: Lang }) {
                         type="button"
                         variant="outline"
                         aria-invalid={dateMissing || undefined}
+                        onPointerEnter={loadCalendar}
+                        onFocus={loadCalendar}
+                        onTouchStart={loadCalendar}
                         className={cn("h-11 w-full justify-start bg-input/30 font-normal hover:bg-input/50", !date && "text-muted-foreground")}
                       />
                     }
@@ -178,6 +190,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                     <span className="first-letter:uppercase">{date ? dateLabel(date) : c.pickDate}</span>
                   </PopoverTrigger>
                   <PopoverContent className="dark w-auto bg-popover p-0 text-popover-foreground" align="start">
+                    <Suspense fallback={<CalendarPlaceholder />}>
                     <Calendar
                       mode="single"
                       locale={dfLocale}
@@ -192,6 +205,7 @@ export function BookingSection({ lang }: { lang: Lang }) {
                         }
                       }}
                     />
+                    </Suspense>
                   </PopoverContent>
                 </Popover>
                 {dateMissing && <FieldError>{c.dateError}</FieldError>}
