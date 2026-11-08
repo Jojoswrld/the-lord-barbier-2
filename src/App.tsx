@@ -4,7 +4,6 @@ import { siFacebook, siWhatsapp } from "simple-icons"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -13,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { business, gallery, shopPhoto, shopServices, t, visitServices, type Lang, type Service } from "@/content"
+import { FadeImg, HeroSlides, PhotoViewer } from "@/photos"
 
 function initialLang(): Lang {
   // A ?lang=en / ?lang=es link (e.g. from the villa QR card) wins over everything else.
@@ -63,6 +63,8 @@ export default function App() {
   const [navOpen, setNavOpen] = useState(false)
   const [photo, setPhoto] = useState<number | null>(null)
   const c = t[lang]
+  const galleryPhotos = gallery.map((g) => ({ src: g.src, alt: g.alt[lang] }))
+  const heroPhotos = [{ src: shopPhoto.src, alt: shopPhoto.alt[lang] }, ...galleryPhotos]
 
   useEffect(() => {
     document.documentElement.lang = lang
@@ -197,17 +199,12 @@ export default function App() {
                 </div>
               </dl>
             </div>
-            <figure className="relative aspect-[4/5] overflow-hidden sm:aspect-[16/10] md:aspect-auto">
-              {/* TODO: replace with a larger shop photo; this source is only 270×600 */}
-              <img
-                src={shopPhoto.src}
-                alt={shopPhoto.alt[lang]}
-                className="photo-mono absolute inset-0 size-full object-cover object-center"
-              />
-              <figcaption className="absolute bottom-0 left-0 bg-background px-5 py-3 text-sm text-muted-foreground">
-                {shopPhoto.alt[lang]}
-              </figcaption>
-            </figure>
+            {/* TODO: the shop photo is only 270×600; swap in a larger one when available */}
+            <HeroSlides
+              photos={heroPhotos}
+              label={c.heroPhotos}
+              className="aspect-[4/5] sm:aspect-[16/10] md:aspect-auto"
+            />
           </div>
         </section>
 
@@ -263,24 +260,14 @@ export default function App() {
                     className="block w-full overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
                     aria-label={g.alt[lang]}
                   >
-                    <img src={g.src} alt={g.alt[lang]} loading="lazy" className="photo-mono aspect-[4/5] w-full object-cover" />
+                    <FadeImg src={g.src} alt={g.alt[lang]} loading="lazy" decoding="async" className="photo-mono aspect-[4/5] w-full bg-muted object-cover" />
                   </button>
                   <figcaption className="mt-3 text-sm text-muted-foreground">{g.alt[lang]}</figcaption>
                 </figure>
               ))}
             </div>
           </div>
-          <Dialog open={photo !== null} onOpenChange={(o) => !o && setPhoto(null)}>
-            <DialogContent className="dark max-w-[min(92vw,720px)] rounded-[3px] bg-background p-2 text-foreground sm:max-w-[min(92vw,720px)]">
-              {photo !== null && (
-                <>
-                  <DialogTitle className="sr-only">{gallery[photo].alt[lang]}</DialogTitle>
-                  <img src={gallery[photo].src} alt={gallery[photo].alt[lang]} className="max-h-[80vh] w-full object-contain" />
-                  <p className="px-2 pb-2 text-sm text-muted-foreground">{gallery[photo].alt[lang]}</p>
-                </>
-              )}
-            </DialogContent>
-          </Dialog>
+          <PhotoViewer photos={galleryPhotos} index={photo} onIndexChange={setPhoto} labels={c.viewer} />
         </section>
 
         {/* FIND US */}
@@ -397,6 +384,7 @@ function BookingSection({ lang }: { lang: Lang }) {
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const via = ((e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null)?.value
     const f = new FormData(e.currentTarget)
     const svc = all.find((s) => s.id === service)?.name[lang] ?? service
     const lines = [
@@ -408,7 +396,13 @@ function BookingSection({ lang }: { lang: Lang }) {
       `${c.people}: ${f.get("people")}`,
     ]
     if (f.get("notes")) lines.push(`${c.notes.replace(/ \(.*\)/, "")}: ${f.get("notes")}`)
-    window.open(`https://wa.me/${business.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener")
+    const text = lines.join("\n")
+    if (via === "mail" && business.email) {
+      const subject = `${c.emailSubject}: ${f.get("name")}`
+      window.location.href = `mailto:${business.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`
+    } else {
+      window.open(`https://wa.me/${business.whatsapp}?text=${encodeURIComponent(text)}`, "_blank", "noopener")
+    }
   }
 
   const today = new Date().toISOString().split("T")[0]
@@ -489,9 +483,17 @@ function BookingSection({ lang }: { lang: Lang }) {
             <Label htmlFor="notes">{c.notes}</Label>
             <Textarea id="notes" name="notes" rows={3} />
           </div>
-          <Button type="submit" size="lg" className="mt-2 w-full sm:w-fit">
-            <MessageCircle /> {c.send}
-          </Button>
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+            <Button type="submit" name="via" value="whatsapp" size="lg" className="w-full sm:w-fit">
+              <BrandIcon path={siWhatsapp.path} /> {c.send}
+            </Button>
+            {business.email && (
+              <Button type="submit" name="via" value="mail" variant="outline" size="lg" className="w-full bg-transparent sm:w-fit">
+                <Mail /> {c.sendEmail}
+              </Button>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">{c.noStore}</p>
         </form>
       </div>
     </section>

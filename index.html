@@ -55,6 +55,28 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Rokkitt:wght@400..800&family=Archivo:wdth,wght@62..125,400..700&display=swap" rel="stylesheet" />
+
+    <!-- Hold the page until the two faces are in (max 1.2s), so the fallback font never flashes.
+         Without JavaScript the class is never added and the page shows straight away. -->
+    <style>
+      html.js:not(.fonts-ready) #root { opacity: 0; }
+      #root { transition: opacity 0.35s ease-out; }
+      @media (prefers-reduced-motion: reduce) { #root { transition: none; } }
+    </style>
+    <script>
+      (function () {
+        var root = document.documentElement
+        root.classList.add("js")
+        var ready = function () { root.classList.add("fonts-ready") }
+        setTimeout(ready, 1200)
+        if (document.fonts && document.fonts.load) {
+          Promise.all([
+            document.fonts.load('700 1em "Rokkitt"'),
+            document.fonts.load('400 1em "Archivo"'),
+          ]).then(ready, ready)
+        } else ready()
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

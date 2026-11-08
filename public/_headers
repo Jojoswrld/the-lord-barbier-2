@@ -1,0 +1,14 @@
+# Cloudflare Pages caching rules.
+# Photos rarely change: keep them for 30 days. If a photo is replaced, give the new file a new name.
+/images/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+# Vite puts a content fingerprint in these file names, so they can be cached for a year.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The page itself and small text files: browsers check for a newer copy on every visit.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/villa-card
+  Cache-Control: public, max-age=0, must-revalidate
