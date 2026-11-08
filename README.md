@@ -3,11 +3,11 @@
 Second version of the website for The Lord Barbier, a classic barbershop in La Fortuna, San Carlos, Costa Rica (since 2020).
 Bilingual (Spanish / English), black and white, with WhatsApp booking.
 
-Live: https://the-lord-barbier.pages.dev
+Live: https://the-lord-barbier-2.lavalogic.workers.dev
 
 Its sister site, The Lord Barbier 1 (the first version, with Nicole's nail corner), is the repo `the-lord-barbier-1`.
 
-Villa / hotel QR card (printable A6): https://the-lord-barbier.pages.dev/villa-card
+Villa / hotel QR card (printable A6): https://the-lord-barbier-2.lavalogic.workers.dev/villa-card
 
 ## Stack
 
@@ -31,7 +31,7 @@ npm run dev
 
 ```bash
 npm run build
-npx wrangler pages deploy dist --project-name=the-lord-barbier --branch=main
+npx wrangler deploy
 ```
 
 If a custom domain is added, update the site URL in `index.html`, `public/robots.txt` and `public/sitemap.xml`,

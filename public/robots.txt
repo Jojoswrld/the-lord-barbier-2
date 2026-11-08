@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://the-lord-barbier.pages.dev/sitemap.xml
+Sitemap: https://the-lord-barbier-2.lavalogic.workers.dev/sitemap.xml
