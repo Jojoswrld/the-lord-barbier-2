@@ -15,8 +15,7 @@ Vite + React + TypeScript, Tailwind CSS v4, shadcn/ui (Base UI). Fonts: Rokkitt 
 All copy, prices, services, contact details and photos are in `src/content.ts`.
 Business details for Google and link previews are in `index.html`.
 
-Still to fill in: prices (shown as "₡ —"), opening hours, and a larger photo of the shop for the hero
-(`public/images/shop-interior.jpg` is only 270×600).
+Still to fill in: prices (shown as "₡ —") and opening hours.
 
 ## Run locally
 

@@ -98,7 +98,7 @@ export const gallery = [
 ]
 
 export const shopPhoto = {
-  src: "/images/shop-interior.jpg",
+  src: "/images/shop-interior-hd.jpg",
   alt: { en: "Inside the shop in La Fortuna", es: "La barbería por dentro, en La Fortuna" },
 }
 

@@ -199,7 +199,6 @@ export default function App() {
                 </div>
               </dl>
             </div>
-            {/* TODO: the shop photo is only 270×600; swap in a larger one when available */}
             <HeroSlides
               photos={heroPhotos}
               label={c.heroPhotos}
