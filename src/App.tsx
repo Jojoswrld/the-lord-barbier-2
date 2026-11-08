@@ -4,14 +4,11 @@ import { siFacebook, siWhatsapp } from "simple-icons"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { business, gallery, shopPhoto, shopServices, t, visitServices, type Lang, type Service } from "@/content"
+import { BookingSection } from "@/booking"
 import { FadeImg, HeroSlides, PhotoViewer } from "@/photos"
 
 function initialLang(): Lang {
@@ -371,130 +368,5 @@ export default function App() {
         </a>
       </div>
     </div>
-  )
-}
-
-function BookingSection({ lang }: { lang: Lang }) {
-  const c = t[lang].book
-  const all = [...shopServices, ...visitServices.filter((s) => s.id !== "villa")]
-  const items = all.map((s) => ({ value: s.id, label: s.name[lang] }))
-  const [service, setService] = useState<string>("cut")
-  const [where, setWhere] = useState<"shop" | "villa">("shop")
-
-  function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const via = ((e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null)?.value
-    const f = new FormData(e.currentTarget)
-    const svc = all.find((s) => s.id === service)?.name[lang] ?? service
-    const lines = [
-      c.msgHello,
-      `${c.name}: ${f.get("name")}`,
-      `${c.service}: ${svc}`,
-      `${c.where}: ${where === "shop" ? c.atShop : `${c.atVilla} (${f.get("place")})`}`,
-      `${c.date}: ${f.get("date")}${f.get("time") ? " " + f.get("time") : ""}`,
-      `${c.people}: ${f.get("people")}`,
-    ]
-    if (f.get("notes")) lines.push(`${c.notes.replace(/ \(.*\)/, "")}: ${f.get("notes")}`)
-    const text = lines.join("\n")
-    if (via === "mail" && business.email) {
-      const subject = `${c.emailSubject}: ${f.get("name")}`
-      window.location.href = `mailto:${business.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`
-    } else {
-      window.open(`https://wa.me/${business.whatsapp}?text=${encodeURIComponent(text)}`, "_blank", "noopener")
-    }
-  }
-
-  const today = new Date().toISOString().split("T")[0]
-
-  return (
-    <section id="book" className="dark scroll-mt-16 bg-background py-16 text-foreground md:py-24">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 md:grid-cols-[1fr_1.4fr]">
-        <div>
-          <SectionHead title={c.title} intro={c.lead} />
-          <p className="mt-8 text-muted-foreground">
-            WhatsApp{" "}
-            <a href={`https://wa.me/${business.whatsapp}`} target="_blank" rel="noreferrer" className="text-foreground underline underline-offset-4">
-              +506 {business.phoneDisplay}
-            </a>
-          </p>
-        </div>
-        <form onSubmit={submit} className="grid gap-5">
-          <div className="grid gap-2">
-            <Label htmlFor="name">{c.name}</Label>
-            <Input id="name" name="name" required autoComplete="name" className="h-11" />
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label>{c.service}</Label>
-              <Select items={items} value={service} onValueChange={(v) => v && setService(v as string)}>
-                <SelectTrigger className="w-full data-[size=default]:h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {items.map((i) => (
-                    <SelectItem key={i.value} value={i.value}>
-                      {i.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <fieldset className="grid gap-2">
-              <legend className="mb-2 text-sm font-medium">{c.where}</legend>
-              <div className="flex h-11 items-center gap-5">
-                {(["shop", "villa"] as const).map((w) => (
-                  <label key={w} className="flex cursor-pointer items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="where"
-                      value={w}
-                      checked={where === w}
-                      onChange={() => setWhere(w)}
-                      className="size-4 accent-[var(--primary)]"
-                    />
-                    {w === "shop" ? c.atShop : c.atVilla}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          </div>
-          {where === "villa" && (
-            <div className="grid gap-2">
-              <Label htmlFor="place">{c.place}</Label>
-              <Input id="place" name="place" required className="h-11" />
-            </div>
-          )}
-          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
-            <div className="grid gap-2">
-              <Label htmlFor="date">{c.date}</Label>
-              <Input id="date" name="date" type="date" min={today} required className="h-11" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="time">{c.time}</Label>
-              <Input id="time" name="time" type="time" className="h-11" />
-            </div>
-            <div className="col-span-2 grid gap-2 sm:col-span-1">
-              <Label htmlFor="people">{c.people}</Label>
-              <Input id="people" name="people" type="number" min={1} defaultValue={1} className="h-11" />
-            </div>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="notes">{c.notes}</Label>
-            <Textarea id="notes" name="notes" rows={3} />
-          </div>
-          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-            <Button type="submit" name="via" value="whatsapp" size="lg" className="w-full sm:w-fit">
-              <BrandIcon path={siWhatsapp.path} /> {c.send}
-            </Button>
-            {business.email && (
-              <Button type="submit" name="via" value="mail" variant="outline" size="lg" className="w-full bg-transparent sm:w-fit">
-                <Mail /> {c.sendEmail}
-              </Button>
-            )}
-          </div>
-          <p className="text-sm text-muted-foreground">{c.noStore}</p>
-        </form>
-      </div>
-    </section>
   )
 }
