@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Local secrets (Wrangler reads .dev.vars; never commit either)
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
