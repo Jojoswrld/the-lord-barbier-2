@@ -1,22 +1,20 @@
 # The Lord Barbier 2
 
-Second version of the website for The Lord Barbier, a classic barbershop in La Fortuna, San Carlos, Costa Rica (since 2020).
-Bilingual (Spanish / English), black and white, with WhatsApp booking.
+Bilingual (Spanish / English) website for The Lord Barbier, a classic barbershop in La Fortuna, San Carlos, Costa Rica (since 2020). Black and white, with WhatsApp booking.
 
-Live: https://the-lord-barbier-2.lavalogic.workers.dev
+**Live:** https://the-lord-barbier-2.lavalogic.workers.dev
 
 Its sister site, The Lord Barbier 1 (the first version, with Nicole's nail corner), is the repo `the-lord-barbier-1`.
 
 Villa / hotel QR card (printable A6): https://the-lord-barbier-2.lavalogic.workers.dev/villa-card
 
-## Stack
+## Built with
 
-Vite + React + TypeScript, Tailwind CSS v4, shadcn/ui (Base UI). Fonts: Rokkitt and Archivo (Google Fonts).
+Vite + React + TypeScript, Tailwind CSS v4, shadcn/ui (Base UI). Fonts: Rokkitt and Archivo (Google Fonts). Deployed as a Cloudflare Worker (static assets from `dist`).
 
-## Editing content
+## Edit content
 
-All copy, prices, services, contact details and photos are in `src/content.ts`.
-Business details for Google and link previews are in `index.html`.
+Copy, prices, services, contact details and photos live in `src/content.ts`. Business details for Google and link previews are in `index.html`.
 
 Still to fill in: prices (shown as "₡ —") and opening hours.
 
@@ -27,12 +25,11 @@ npm install
 npm run dev
 ```
 
-## Deploy (Cloudflare Pages)
+## Deploy
 
 ```bash
 npm run build
 npx wrangler deploy
 ```
 
-If a custom domain is added, update the site URL in `index.html`, `public/robots.txt` and `public/sitemap.xml`,
-and regenerate the QR code in `public/villa-card.html`.
+If a custom domain is added, update the site URL in `index.html`, `public/robots.txt` and `public/sitemap.xml`, and regenerate the QR code in `public/villa-card.html`.
